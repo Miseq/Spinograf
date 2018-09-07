@@ -26,8 +26,8 @@ class Spiro:
         self.l = l         # stosunek odcinka rysik-centrum mniejszego do r
 
         # największy wspólny dzielnik promieni
-        NWDprom = fractions._gcd(self.r, self.R)
-        self.nRot = self.r//NWDprom
+        nwd_promienia = fractions._gcd(self.r, self.R)
+        self.n_rot = self.r//nwd_promienia
 
         # stosunek promieni
         self.k = r/float(R)
@@ -48,7 +48,7 @@ class Spiro:
 
     def draw(self):
         r, l, k = self.R, self.l, self.k
-        for point in range(0, 360*self.nRot + 1, self.step):
+        for point in range(0, 360*self.n_rot + 1, self.step):
             a = math.radians(point)
             x = r * ((1 - k) * math.cos(a) + l * k * math.cos((l - k)*a/k))
             y = r * ((1 - k) * math.sin(a) - l * k * math.sin((l - k)*a/k))
@@ -64,7 +64,7 @@ class Spiro:
         x = r * ((1 - k) * math.cos(a) + l * k * math.cos((l - k) / k * a))
         y = r * ((1 - k) * math.sin(a) + l * k * math.sin((l - k) / k * a))
         self.turtle.setpos(self.xc + x, self.yc + y)
-        if self.alpha > 360*self.nRot:
+        if self.alpha > 360*self.n_rot:
             self.DrawningComplete = True
             self.turtle.hideturtle()
 
@@ -79,13 +79,13 @@ class SpiroAnimator():
         self.height = turtle.window_height()
         self.spirografy = []
         for i in range(N):
-            randomparams = self.genRandomParams()   # tutaj otrzymujemy krotkę randomparams
+            randomparams = self.gen_random_params()   # tutaj otrzymujemy krotkę randomparams
             spiro = Spiro(*randomparams)    # spino oczekuje listy więc Python poprzez znak * konwertuje krotkę do niej
             self.spirografy.append(spiro)
-        #timer
+        # timer
         turtle.ontimer(self.update, self.delatTime)
 
-    def genRandomParams(self):
+    def gen_random_params(self):
         height = self.height
         width = self.width
         R = random.randint(50, min(width, height)//2)
@@ -99,19 +99,19 @@ class SpiroAnimator():
     def mass_restart(self):
         for spiro in self.spirografy:
             spiro.clear()
-            random_params = self.genRandomParams()
+            random_params = self.gen_random_params()
             spiro.set_params(*random_params)
             spiro.restart()
 
     def update(self):
-        nComplete = 0
+        n_complete = 0
         for spiro in self.spirografy:
             spiro.update()
             if spiro.DrawningComplete:
-                nComplete += 1
-        if nComplete == len(self.spirografy):
+                n_complete += 1
+        if n_complete == len(self.spirografy) - 1:
             self.mass_restart()
-        turtle.ontimer(self.update(), self.delatTime)
+        turtle.ontimer(self.update, self.delatTime)
 
     def toogle_turtle(self):
         for sprio in self.spirografy:
@@ -123,7 +123,7 @@ class SpiroAnimator():
 def saving_sprio():
     turtle.hideturtle()
     # generowanie nazwy pliku
-    date_string = (datetime.datetime.now()).strftime("%d%b%Y - %H%M%S")     # TODO sprawdzi czy wielkość liter ma znaczenie
+    date_string = (datetime.datetime.now()).strftime("%d%b%Y - %H%M%S")
     file_name = 'spiro-' + date_string
     print('zapisywanie do pliku %s.png' % file_name)
     canvas = turtle.getcanvas()
@@ -153,7 +153,7 @@ def main():
         spiro = Spiro(0.0, 0.0, col, *params)   # * konwertuje listę na parametry
         spiro.draw()
     else:
-        spiro = SpiroAnimator(6)
+        spiro = SpiroAnimator(2)
         turtle.onkey(spiro.toogle_turtle(), 't')
         turtle.onkey(spiro.mass_restart(), 'space')
 
